@@ -16,10 +16,7 @@ export class HitCounter extends cdk.Construct {
     super(scope, id);
 
     const table = new dynamodb.Table(this, 'Hits', {
-      partitionKey: {
-        name: 'path',
-        type: dynamodb.AttributeType.STRING
-      }
+        partitionKey: { name: 'path', type: dynamodb.AttributeType.STRING }
     });
 
     this.handler = new lambda.Function(this, 'HitCounterHandler', {
@@ -30,6 +27,9 @@ export class HitCounter extends cdk.Construct {
         DOWNSTREAM_FUNCTION_NAME: props.downstream.functionName,
         HITS_TABLE_NAME: table.tableName
       }
-    })
+    });
+
+    // grant the lambda role read/write permissions to our table
+    table.grantReadWriteData(this.handler);
   }
 }
